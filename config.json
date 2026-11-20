@@ -1,0 +1,17 @@
+{
+  "_ajuda": "Este é o painel da vitrine. Mude um valor, salve (Commit changes) e a página se atualiza sozinha em 1 ou 2 minutos.",
+
+  "afiliado": "?bg_ref=Zxntoj0YBX&utm_source=Lucas%20Cozinha%20do%20Le%C3%A3o&utm_medium=affiliate&utm_campaign=Na%C3%A7%C3%A3o%20Verde%20-%20Embaixadores",
+  "whatsapp": "5535991498535",
+  "instagram": "https://instagram.com/nutrileao",
+  "tiktok": "https://tiktok.com/@nutri.leo",
+
+  "_ajuda_linksEspeciais": "Para um produto com link próprio: \"handle-do-produto\": \"https://link-completo\". O handle é o fim do endereço do produto na loja, depois de /products/.",
+  "linksEspeciais": {},
+
+  "_ajuda_ofertaFixa": "Deixe vazio para a oferta rodar sozinha todo dia. Para travar um produto no destaque, coloque o handle dele aqui.",
+  "ofertaFixa": "",
+
+  "_ajuda_esconder": "Handles de produtos que não devem aparecer na vitrine, entre aspas e separados por vírgula.",
+  "esconder": []
+}
