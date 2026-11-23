@@ -6,6 +6,9 @@
   "instagram": "https://instagram.com/nutrileao",
   "tiktok": "https://tiktok.com/@nutri.leo",
 
+  "_ajuda_descontoPix": "Desconto no Pix que a loja dá em todos os produtos, em %. A vitrine mostra o preço no Pix em destaque, igual à loja. Use 0 para mostrar só o preço do cartão.",
+  "descontoPix": 5,
+
   "_ajuda_linksEspeciais": "Para um produto com link próprio: \"handle-do-produto\": \"https://link-completo\". O handle é o fim do endereço do produto na loja, depois de /products/.",
   "linksEspeciais": {},
 
