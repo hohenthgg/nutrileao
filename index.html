@@ -201,7 +201,7 @@ dialog.td[open]{display:flex;flex-direction:column}
   <div class="busca" role="search">
     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
     <label class="so-leitor" for="busca">Buscar suplemento pelo nome</label>
-    <input id="busca" type="text" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="Buscar suplemento">
+    <input id="busca" type="text" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="Buscar qualquer produto">
     <button type="button" class="limpar" id="limpar" aria-label="Limpar busca" hidden>×</button>
   </div>
 </header>
@@ -239,7 +239,7 @@ dialog.td[open]{display:flex;flex-direction:column}
 (function () {
 'use strict';
 
-var D, P, porHandle = {}, n = 2, abertos = {}, destaque = null, cat = '', hojeTxt = '';
+var D, P, TODOS = [], porHandle = {}, n = 2, abertos = {}, destaque = null, cat = '', hojeTxt = '';
 var $ = function (id) { return document.getElementById(id); };
 var brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 var R = function (v) { return brl.format(v).replace(/ /g, ' '); };
@@ -305,7 +305,7 @@ function chip(id, nome) {
 function renderBusca(q) {
   var r = buscar(q, 40);
   $('app').innerHTML = '<section class="bloco achou"><h2>' +
-    (r.length ? 'Achei ' + r.length + (r.length > 1 ? ' suplementos' : ' suplemento') : 'Não achei “' + esc(q) + '”') + '</h2>' +
+    (r.length ? 'Achei ' + r.length + (r.length > 1 ? ' produtos' : ' produto') : 'Não achei “' + esc(q) + '”') + '</h2>' +
     (r.length ? prateleiras(r, false)
       : '<p class="vazio">Tente outro nome. Se preferir, o Leão te ajuda.</p><a class="acao" target="_blank" rel="noopener" href="' + esc(zap('Oi, Leão! Estou procurando: ' + q)) + '">Chamar no WhatsApp</a>') +
     '</section>';
@@ -368,7 +368,7 @@ function perto(a, b) {
 function buscar(q, max) {
   var ts = termos(q); if (!ts.length) return [];
   var achados = [];
-  P.forEach(function (p, pos) {
+  TODOS.forEach(function (p, pos) {
     var bateu = 0, pontos = 0;
     ts.forEach(function (t) {
       var melhor = 0;
@@ -498,7 +498,8 @@ function tiraDuvidas() {
 carregar().then(function (dados) {
   D = dados; P = D.produtos || [];
   if (!P.length) throw 0;
-  P.forEach(function (p) { porHandle[p.h] = p; p._w = semAcento(p.nome + ' ' + p.h.replace(/-/g, ' ')).split(/[^a-z0-9]+/).filter(Boolean); });
+  TODOS = P.concat(D.outros || []);
+  TODOS.forEach(function (p) { porHandle[p.h] = p; p._w = semAcento(p.nome + ' ' + p.h.replace(/-/g, ' ')).split(/[^a-z0-9]+/).filter(Boolean); });
   var quando = new Date(D.atualizadoEm);
   var dia = quando.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', timeZone: 'America/Sao_Paulo' }).replace('.', '');
   var velho = Date.now() - quando.getTime() > 36 * 3600 * 1000;
