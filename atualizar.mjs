@@ -18,6 +18,7 @@ const PADRAO = {
   linksEspeciais: {}, // 'handle-do-produto': 'https://link-completo'
   ofertaFixa: '',     // handle do produto travado no destaque; vazio = rodízio diário
   esconder: [],       // handles que não devem aparecer
+  descontoPix: 5,     // % que a loja tira no Pix em todos os produtos; 0 = mostrar só o preço do cartão
 };
 
 function lerConfig() {
@@ -154,7 +155,11 @@ export function montar(produtosCrus, ordemMaisVendidos, config = CONFIG, agora =
     const img = p.images && p.images[0] && p.images[0].src;
     if (!img) continue;
 
-    const item = { h: p.handle, nome: NOMES[p.handle] || nomeCurto(titulo), preco: centavos(v.price) / 100, img };
+    // A loja mostra em destaque o preço no Pix (catálogo menos o desconto, arredondado para cima no centavo).
+    const cartao = centavos(v.price) / 100;
+    const pix = Number(config.descontoPix) || 0;
+    const item = { h: p.handle, nome: NOMES[p.handle] || nomeCurto(titulo), preco: pix ? Math.ceil(centavos(v.price) * (100 - pix) / 100 - 1e-6) / 100 : cartao, img };
+    if (pix) item.cartao = cartao;
     if (emPromo.length) {
       const off = Math.round((1 - item.preco / (centavos(v.compare_at_price) / 100)) * 100);
       if (off >= PROMO_MINIMA) { item.de = centavos(v.compare_at_price) / 100; item.off = off; }
@@ -179,6 +184,7 @@ export function montar(produtosCrus, ordemMaisVendidos, config = CONFIG, agora =
     atualizadoEm: agora.toISOString(),
     loja: config.loja,
     afiliado: config.afiliado,
+    pix: Number(config.descontoPix) || 0,
     whatsapp: config.whatsapp,
     instagram: config.instagram,
     tiktok: config.tiktok,
