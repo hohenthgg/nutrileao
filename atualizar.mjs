@@ -142,11 +142,12 @@ export function escolherOferta(produtos, agora = new Date()) {
 export function montar(produtosCrus, ordemMaisVendidos, config = CONFIG, agora = new Date()) {
   const posicao = new Map(ordemMaisVendidos.map((h, i) => [h, i]));
   const produtos = [];
+  const outros = []; // resto da loja: fica fora das prateleiras, mas entra na busca, já com o link de afiliado
 
   for (const p of produtosCrus) {
     const titulo = p.title || '';
     if ((config.esconder || []).includes(p.handle)) continue;
-    if (!SEMPRE.test(titulo) && (!INCLUIR.test(titulo) || EXCLUIR.test(titulo))) continue;
+    const naVitrine = SEMPRE.test(titulo) || (INCLUIR.test(titulo) && !EXCLUIR.test(titulo));
 
     const disponiveis = (p.variants || []).filter((v) => v.available);
     if (!disponiveis.length) continue;
@@ -165,18 +166,17 @@ export function montar(produtosCrus, ordemMaisVendidos, config = CONFIG, agora =
       if (off >= PROMO_MINIMA) { item.de = centavos(v.compare_at_price) / 100; item.off = off; }
     }
     const texto = titulo + ' ' + p.handle.replace(/-/g, ' ');
-    item.cat = categoria(texto);
+    item.cat = naVitrine ? categoria(texto) : 'loja';
     const qtd = item.cat === 'kits' ? '' : quantidade(texto);
     if (qtd && !item.nome.toLowerCase().replace(/\s/g, '').includes(qtd.replace(/\s/g, ''))) item.qtd = qtd;
     if (new Set(disponiveis.map((x) => x.price)).size > 1) item.apartir = true;
     const especial = (config.linksEspeciais || {})[p.handle];
     if (especial) item.link = especial;
     item._pos = posicao.has(p.handle) ? posicao.get(p.handle) : 9999;
-    produtos.push(item);
+    (naVitrine ? produtos : outros).push(item);
   }
 
-  produtos.sort((a, b) => a._pos - b._pos);
-  produtos.forEach((p) => delete p._pos);
+  for (const lista of [produtos, outros]) { lista.sort((a, b) => a._pos - b._pos); lista.forEach((p) => delete p._pos); }
 
   const oferta = produtos.find((p) => p.h === config.ofertaFixa) || escolherOferta(produtos, agora);
 
@@ -191,6 +191,7 @@ export function montar(produtosCrus, ordemMaisVendidos, config = CONFIG, agora =
     oferta: oferta ? oferta.h : null,
     categorias: listaDeCategorias(produtos),
     produtos, // já na ordem de mais vendidos
+    outros, // só aparecem na busca
   };
 }
 
