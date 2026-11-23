@@ -72,6 +72,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .off{font-size:13.5px;font-weight:700;color:var(--verde)}
 .qt{font-size:13px;color:var(--apoio);line-height:1.3}
 .txt .qt{font-size:15px;margin:6px 0 0}
+.por small{font-size:12px;font-weight:600;color:var(--apoio)}
+.nopix{font-size:13.5px;font-weight:700}
 .esp{flex:1;min-height:10px}
 .cta{display:flex;align-items:center;justify-content:center;width:100%;max-width:168px;min-height:46px;background:var(--verde);color:#fff;border-radius:23px;font-weight:600;font-size:15.5px;transition:background .15s}
 .it:hover .cta{background:var(--verde-escuro)}
@@ -267,7 +269,7 @@ function item(p, i, numero) {
     '<span class="leg"><span class="nm">' + (numero ? '<span class="so-leitor">' + numero + 'º mais vendido: </span>' : '') + esc(p.nome) + '</span>' +
     (p.qtd ? '<span class="qt">' + esc(p.qtd) + '</span>' : '') +
     (p.de ? '<span class="de">' + R(p.de) + '</span>' : '') +
-    '<span class="por">' + (p.apartir ? '<span class="so-leitor">a partir de </span>' : '') + R(p.preco) + '</span>' +
+    '<span class="por">' + (p.apartir ? '<span class="so-leitor">a partir de </span>' : '') + R(p.preco) + (D.pix ? ' <small>no Pix</small>' : '') + '</span>' +
     (p.off ? '<span class="off">−' + p.off + '%</span>' : '') + '<span class="esp"></span><span class="cta">Comprar</span></span></a>';
 }
 function prateleiras(lista, comNumero) {
@@ -309,9 +311,9 @@ function render() {
     (of.off ? '<span class="etq"><b>−' + of.off + '%</b></span>' : '') + '</div>' +
     '<div class="txt"><h1>' + esc(of.nome) + '</h1>' + (of.qtd ? '<p class="qt">' + esc(of.qtd) + '</p>' : '') +
     '<div class="precos"><span class="preco-g">' + R(of.preco) + '</span>' +
-    (of.de ? '<span class="preco-lado"><span class="preco-de"><span class="so-leitor">antes </span>' + R(of.de) + '</span><span class="eco">Economia de ' + R(of.de - of.preco) + '</span></span>' : '') + '</div>' +
+    ((of.de || D.pix) ? '<span class="preco-lado">' + (D.pix ? '<span class="nopix">no Pix</span>' : '') + (of.de ? '<span class="preco-de"><span class="so-leitor">antes </span>' + R(of.de) + '</span><span class="eco">Economia de ' + R(of.de - of.preco) + '</span>' : '') + '</span>' : '') + '</div>' +
     '<a class="botao" href="' + esc(link(of)) + '" rel="sponsored">Comprar na loja</a>' +
-    '<p class="nota">' + esc(hojeTxt) + '. Mesmo preço da loja.</p></div></section>';
+    '<p class="nota">' + (of.cartao ? 'No cartão, ' + R(of.cartao) + '. ' : '') + esc(hojeTxt) + '.</p></div></section>';
   h += bloco('vendidos', 'Mais vendidos', topo, 99, true, '');
   h += bloco('promos', 'Mais promoções de hoje', promos, n === 2 ? 6 : n * 2, false, 'Ver todas as promoções');
   var lista = cat ? P.filter(function (p) { return p.cat === cat; }) : P;
@@ -364,7 +366,7 @@ function buscar(q, max) {
 }
 function linha(p) {
   return '<a class="linha" href="' + esc(link(p)) + '" rel="sponsored"><img alt="" loading="lazy" src="' + esc(foto(p, 120)) + '">' +
-    '<span class="nm">' + esc(p.nome) + '</span><span class="lp">' + (p.de ? '<span class="de">' + R(p.de) + '</span><br>' : '') + '<span class="por">' + R(p.preco) + '</span></span></a>';
+    '<span class="nm">' + esc(p.nome) + '</span><span class="lp">' + (p.de ? '<span class="de">' + R(p.de) + '</span><br>' : '') + '<span class="por">' + R(p.preco) + (D.pix ? ' <small>no Pix</small>' : '') + '</span></span></a>';
 }
 
 /* ---------- tira-dúvidas (regras fixas + dados do dia; sem IA) ---------- */
@@ -404,7 +406,7 @@ function responder(q) {
     var linhas = [];
     var t0 = termos(q)[0];
     if (prods.length === 1 || termos(q).length > 1 || (um._w[0] === t0 && prods[1]._w[0] !== t0)) {
-      linhas.push(um.nome + ' está por ' + R(um.preco) + ' hoje' + (um.de ? ', em promoção (antes ' + R(um.de) + ', ' + um.off + '% a menos).' : '. Hoje não está em promoção.'));
+      linhas.push(um.nome + ' está por ' + R(um.preco) + (um.cartao ? ' no Pix (' + R(um.cartao) + ' no cartão) hoje' : ' hoje') + (um.de ? ', em promoção (antes ' + R(um.de) + ', ' + um.off + '% a menos).' : '. Hoje não está em promoção.'));
       prods = [um];
     } else linhas.push('Achei estes. O preço é o de hoje:');
     if (tem(/serve|beneficio|funciona|resultado|emagrec|vale a pena|e bom/)) linhas.push('Para que serve, veja a descrição na página da loja e os vídeos do Leão. Eu não prometo resultado: suplemento não é remédio.');
