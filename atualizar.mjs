@@ -19,6 +19,7 @@ const PADRAO = {
   ofertaFixa: '',     // handle do produto travado no destaque; vazio = rodízio diário
   esconder: [],       // handles que não devem aparecer
   descontoPix: 5,     // % que a loja tira no Pix em todos os produtos; 0 = mostrar só o preço do cartão
+  principal: '',      // handle do produto principal do Leão: ganha uma vitrine própria logo abaixo do destaque
 };
 
 function lerConfig() {
@@ -185,6 +186,7 @@ export function montar(produtosCrus, ordemMaisVendidos, config = CONFIG, agora =
     loja: config.loja,
     afiliado: config.afiliado,
     pix: Number(config.descontoPix) || 0,
+    principal: config.principal || '',
     whatsapp: config.whatsapp,
     instagram: config.instagram,
     tiktok: config.tiktok,
