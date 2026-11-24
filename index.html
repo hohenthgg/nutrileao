@@ -9,6 +9,9 @@
 <meta property="og:title" content="Nutri Leão — suplementos com o preço de hoje">
 <meta property="og:description" content="Oferta do dia, promoções e mais vendidos. Preço atualizado todo dia.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://nutrileao.pages.dev/">
+<meta property="og:image" content="https://nutrileao.pages.dev/capa.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231E5A3A'/%3E%3Crect x='10' y='40' width='44' height='8' rx='2' fill='%23DDB888'/%3E%3Crect x='24' y='16' width='16' height='24' rx='4' fill='%23F0EBE1'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -80,6 +83,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .cta{display:flex;align-items:center;justify-content:center;width:100%;max-width:168px;min-height:46px;background:var(--verde);color:#fff;border-radius:23px;font-weight:600;font-size:15.5px;transition:background .15s}
 .it:hover .cta{background:var(--verde-escuro)}
 .prats{display:flex;flex-direction:column;gap:44px}
+.it .cta{background:transparent;color:var(--verde);border:1.5px solid var(--verde)}
+.it:hover .cta,.forte .it .cta{background:var(--verde);color:#fff}
 
 /* herói */
 .heroi{padding-top:8px;display:grid;gap:0}
@@ -300,7 +305,7 @@ function bloco(id, titulo, lista, visiveis, comNumero, rotulo) {
     (tudo ? '' : '<button type="button" class="mais" data-abrir="' + id + '">' + rotulo + ' (' + lista.length + ')</button>') + '</section>';
 }
 function chip(id, nome) {
-  return '<button type="button" data-cat="' + esc(id) + '" aria-pressed="' + (cat === id) + '">' + esc(nome) + '</button>';
+  return '<button type="button" data-cat="' + esc(id) + '" aria-pressed="' + !!(cat === id && (id || abertos.todos)) + '">' + esc(nome) + '</button>';
 }
 function renderBusca(q) {
   var r = buscar(q, 40);
@@ -328,11 +333,13 @@ function render() {
     ((of.de || D.pix) ? '<span class="preco-lado">' + (D.pix ? '<span class="nopix">no Pix</span>' : '') + (of.de ? '<span class="preco-de"><span class="so-leitor">antes </span>' + R(of.de) + '</span><span class="eco">Economia de ' + R(of.de - of.preco) + '</span>' : '') + '</span>' : '') + '</div>' +
     '<a class="botao" href="' + esc(link(of)) + '" rel="sponsored">Comprar na loja</a>' +
     '<p class="nota">' + (of.cartao ? 'No cartão, ' + R(of.cartao) + '. ' : '') + esc(hojeTxt) + '.</p></div></section>';
+  var pr = D.principal && porHandle[D.principal];
+  if (pr && pr !== of) h += '<section class="bloco forte" id="principal"><h2>O principal do Leão</h2><p class="sub">O produto que é a marca dele.</p><div class="prats"><div class="prat" style="--n:1">' + item(pr, 0, 0) + '</div></div></section>';
   h += bloco('vendidos', 'Mais vendidos', topo, 99, true, '');
-  h += bloco('promos', 'Mais promoções de hoje', promos, n === 2 ? 6 : n * 2, false, 'Ver todas as promoções');
+  h += bloco('promos', 'Mais promoções de hoje', promos, n === 2 ? 4 : n * 2, false, 'Ver todas as promoções');
   var lista = cat ? P.filter(function (p) { return p.cat === cat; }) : P;
-  var vis = n === 2 ? 6 : n * 2;
-  var tudo = abertos.todos || lista.length <= vis;
+  var vis = 0; // fechado: só os filtros. Abre ao escolher um tipo ou tocar em "Ver todos".
+  var tudo = abertos.todos || !!cat;
   h += '<section class="bloco" id="todos"><h2>Todos os suplementos</h2><p class="sub">Escolha um tipo ou veja tudo.</p>' +
     '<div class="cats" role="group" aria-label="Filtrar por tipo">' + chip('', 'Todos') + (D.categorias || []).map(function (c) { return chip(c.id, c.nome); }).join('') + '</div>' +
     prateleiras(tudo ? lista : lista.slice(0, vis), false) +
@@ -516,7 +523,7 @@ carregar().then(function (dados) {
   $('app').addEventListener('click', function (e) {
     var b = e.target.closest('[data-abrir],[data-cat]'); if (!b) return;
     var y = window.scrollY;
-    if (b.hasAttribute('data-cat')) { cat = b.getAttribute('data-cat'); abertos.todos = false; }
+    if (b.hasAttribute('data-cat')) { cat = b.getAttribute('data-cat'); abertos.todos = cat === ''; }
     else abertos[b.getAttribute('data-abrir')] = true;
     render(); window.scrollTo(0, y);
     var marcado = document.querySelector('.cats [aria-pressed="true"]');
