@@ -20,6 +20,9 @@ const PADRAO = {
   esconder: [],       // handles que não devem aparecer
   descontoPix: 5,     // % que a loja tira no Pix em todos os produtos; 0 = mostrar só o preço do cartão
   principal: '',      // handle do produto principal do Leão: ganha uma vitrine própria logo abaixo do destaque
+  selo: '',           // ex.: 'Black Friday'; aparece no destaque só enquanto ele estiver com preço riscado
+  cupom: '',          // código de cupom mostrado na faixa e no destaque; vazio = sem cupom
+  cupomDesconto: 0,   // % do cupom, para calcular o valor final no destaque
 };
 
 function lerConfig() {
@@ -187,6 +190,9 @@ export function montar(produtosCrus, ordemMaisVendidos, config = CONFIG, agora =
     afiliado: config.afiliado,
     pix: Number(config.descontoPix) || 0,
     principal: config.principal || '',
+    selo: config.selo || '',
+    cupom: config.cupom || '',
+    cupomDesconto: Number(config.cupomDesconto) || 0,
     whatsapp: config.whatsapp,
     instagram: config.instagram,
     tiktok: config.tiktok,
