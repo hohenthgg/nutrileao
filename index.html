@@ -192,6 +192,24 @@ dialog.td[open]{display:flex;flex-direction:column}
   .palco .foto img{animation:none}
   *{scroll-behavior:auto!important;transition:none!important}
 }
+.olho.bf{justify-self:center;display:inline-flex;align-items:center;gap:8px;margin:2px auto 10px;padding:7px 14px 6px;background:var(--tinta);color:#fff;border-radius:16px;letter-spacing:.2em}
+.olho.bf::before{content:"";width:7px;height:7px;border-radius:4px;background:#E8B84A}
+.etq.bf i{display:block;transform:rotate(5deg);margin-bottom:-1px;padding:5px 9px 4px;background:var(--tinta);color:#fff;border-radius:4px 4px 0 0;font-style:normal;font-family:var(--sans);font-weight:700;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase}
+.etq.bf b{background:var(--tinta);color:#E8B84A;border-color:var(--tinta);border-radius:0 0 4px 4px}
+.faixa{margin:4px calc(50% - 50vw) 14px;background:var(--tinta);color:#fff;overflow:hidden;white-space:nowrap;transform:rotate(-1.2deg);box-shadow:0 8px 18px -10px rgba(0,0,0,.6)}
+.faixa .rolo{display:inline-flex;padding:11px 0 10px;animation:rolar 40s linear infinite}
+.faixa span{display:inline-flex;align-items:center;gap:7px;padding:0 14px;font-weight:700;font-size:14.5px;letter-spacing:.06em;text-transform:uppercase}
+.faixa span b{color:#E8B84A;font-size:16px;letter-spacing:.1em}
+.faixa span:nth-child(even)::after{content:"";width:6px;height:6px;margin-left:14px;border-radius:3px;background:#E8B84A}
+@keyframes rolar{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.faixa .rolo{animation:none}}
+.cupom{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;padding:12px 12px 12px 16px;background:var(--papel);border:1.5px dashed var(--tinta);border-radius:16px}
+.cupom span{font-size:15px;line-height:1.3}
+.cupom span b{font-family:var(--serifa);font-size:24px;color:var(--verde)}
+.copiar{display:flex;flex-direction:column;align-items:center;min-height:52px;padding:7px 16px 6px;background:var(--tinta);color:#E8B84A;border:0;border-radius:12px;font-family:var(--sans);font-weight:800;font-size:21px;letter-spacing:.12em}
+.copiar small{color:#fff;font-weight:500;font-size:10.5px;letter-spacing:.04em;margin-top:1px}
+.cupom + .botao{margin-top:12px}
+@media (min-width:860px){.olho.bf{justify-self:start;margin-left:0}}
 </style>
 </head>
 <body>
@@ -323,14 +341,19 @@ function render() {
   var topo = P.slice(0, n === 4 ? 8 : n === 5 ? 10 : 6);
   // cada produto aparece uma vez antes do catálogo: destaque, depois ranking, depois as outras promoções
   var promos = P.filter(function (p) { return p.off && p !== of && topo.indexOf(p) < 0; }).sort(function (a, b) { return b.off - a.off; });
-  var h = '<section class="heroi">' +
-    '<p class="olho">' + (destaque ? 'Destaque do Leão' : of.off ? 'Oferta de hoje' : 'O mais vendido') + '</p>' +
+  var bf = !!(D.selo && !destaque && of.off);
+  var faixa = '';
+  if (D.cupom) { var t = '<span>Cupom <b>' + esc(D.cupom) + '</b></span><span>' + (D.cupomDesconto ? '+' + D.cupomDesconto + '% ' : '') + (D.selo ? 'em cima da ' + esc(D.selo) : 'de desconto') + '</span>'; for (var i = 0; i < 12; i++) faixa += t; faixa = '<div class="faixa" aria-hidden="true"><div class="rolo">' + faixa + faixa + '</div></div>'; }
+  var comCupom = D.cupom && D.cupomDesconto && !destaque ? Math.round((of.cartao || of.preco) * (100 - D.cupomDesconto)) / 100 : 0;
+  var h = faixa + '<section class="heroi">' +
+    '<p class="olho' + (bf ? ' bf' : '') + '">' + (destaque ? 'Destaque do Leão' : bf ? esc(D.selo) : of.off ? 'Oferta de hoje' : 'O mais vendido') + '</p>' +
     '<div class="palco prat"><a class="foto" href="' + esc(link(of)) + '" rel="sponsored" aria-label="' + esc(of.nome) + ', comprar na loja">' +
     '<img data-pe crossorigin="anonymous" fetchpriority="high" width="700" height="700" alt="" src="' + esc(foto(of, 720)) + '"></a>' +
-    (of.off ? '<span class="etq"><b>−' + of.off + '%</b></span>' : '') + '</div>' +
+    (of.off ? '<span class="etq' + (bf ? ' bf' : '') + '">' + (bf ? '<i>' + esc(D.selo) + '</i>' : '') + '<b>−' + of.off + '%</b></span>' : '') + '</div>' +
     '<div class="txt"><h1>' + esc(of.nome) + '</h1>' + (of.qtd ? '<p class="qt">' + esc(of.qtd) + '</p>' : '') +
     '<div class="precos"><span class="preco-g">' + R(of.preco).replace('R$ ', '<small>R$</small>') + '</span>' +
     ((of.de || D.pix) ? '<span class="preco-lado">' + (D.pix ? '<span class="nopix">no Pix</span>' : '') + (of.de ? '<span class="preco-de"><span class="so-leitor">antes </span>' + R(of.de) + '</span><span class="eco">Economia de ' + R(of.de - of.preco) + '</span>' : '') + '</span>' : '') + '</div>' +
+    (comCupom ? '<div class="cupom"><span>Com o cupom, fica<br><b>' + R(comCupom) + '</b>' + (of.cartao ? ' no cartão' : '') + '</span><button type="button" class="copiar" data-cupom="' + esc(D.cupom) + '">' + esc(D.cupom) + '<small>tocar para copiar</small></button></div>' : '') +
     '<a class="botao" href="' + esc(link(of)) + '" rel="sponsored">Comprar na loja</a>' +
     '<p class="nota">' + (of.cartao ? 'No cartão, ' + R(of.cartao) + '. ' : '') + esc(hojeTxt) + '.</p></div></section>';
   var pr = D.principal && porHandle[D.principal];
@@ -436,6 +459,7 @@ function responder(q) {
     return { t: D.pix ? ['No Pix sai ' + D.pix + '% mais barato. É o preço em destaque aqui na página.', 'No cartão dá para parcelar. O valor e as parcelas aparecem na loja, na hora de fechar a compra.'] : ['O pagamento é feito no site da Nação Verde. As formas de pagamento e o parcelamento aparecem lá, na hora de fechar a compra.'], a: [{ r: 'Abrir a loja', u: D.loja + '/' + (D.afiliado || '') }] };
   }
   if (tem(/cupom|cupon|codigo de desconto/)) {
+    if (D.cupom) return { t: ['Use o cupom ' + D.cupom + ' na loja, no campo de cupom' + (D.cupomDesconto ? ': ele dá mais ' + D.cupomDesconto + '% de desconto' : '') + '. Confira o valor final no carrinho antes de pagar.'], p: promos.slice(0, 3) };
     return { t: ['Não tenho cupom cadastrado aqui. As promoções de hoje já estão com o preço final:'], p: promos.slice(0, 3) };
   }
   if (um) {
@@ -540,5 +564,6 @@ carregar().then(function (dados) {
 });
 })();
 </script>
+<script>document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.copiar');if(!b)return;var c=b.getAttribute('data-cupom');var s=b.querySelector('small');function ok(){if(s){s.textContent='copiado!';setTimeout(function(){s.textContent='tocar para copiar'},2500)}}try{navigator.clipboard.writeText(c).then(ok,function(){})}catch(x){}});</script>
 </body>
 </html>
