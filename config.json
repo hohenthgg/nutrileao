@@ -16,7 +16,14 @@
   "linksEspeciais": {},
 
   "_ajuda_ofertaFixa": "Deixe vazio para a oferta rodar sozinha todo dia. Para travar um produto no destaque, coloque o handle dele aqui.",
-  "ofertaFixa": "",
+  "ofertaFixa": "combo-do-homem",
+
+  "_ajuda_selo": "Selo que aparece no destaque, por exemplo \"Black Friday\". Só aparece enquanto o produto em destaque estiver com preço riscado na loja. Deixe vazio para tirar.",
+  "selo": "Black Friday",
+
+  "_ajuda_cupom": "Cupom mostrado na faixa que corre no topo e no destaque, com o valor final calculado. Para tirar, deixe \"cupom\": \"\". cupomDesconto é a % do cupom.",
+  "cupom": "LEAO10",
+  "cupomDesconto": 10,
 
   "_ajuda_esconder": "Handles de produtos que não devem aparecer na vitrine, entre aspas e separados por vírgula.",
   "esconder": []
